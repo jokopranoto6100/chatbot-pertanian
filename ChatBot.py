@@ -2,12 +2,17 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import sys
 import re
+import json
+import os
 
 # Setup Google Sheets API
 scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name(
-    r"G:\My Drive\Python\ChatBot\chatbot-pertanian-87265146a3a1.json", scope
-)
+json_str = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+if not json_str:
+    raise Exception("Environment variable GOOGLE_APPLICATION_CREDENTIALS is missing!")
+
+info = json.loads(json_str)
+creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
 client = gspread.authorize(creds)
 sheet = client.open("Data Luas Panen").sheet1
 data = sheet.get_all_records()
